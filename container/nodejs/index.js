@@ -13,9 +13,6 @@ const server = http.createServer((req, res) => {
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', ws => {
-    ws.isAlive = true;
-    ws.on('pong', () => { ws.isAlive = true; });
-
     ws.once('message', msg => {
         const [VERSION] = msg;
         const id = msg.slice(1, 17);
@@ -35,13 +32,5 @@ wss.on('connection', ws => {
         }).on('error', () => { });
     });
 });
-
-setInterval(() => {
-    wss.clients.forEach(ws => {
-        if (ws.isAlive === false) return ws.terminate();
-        ws.isAlive = false;
-        ws.ping();
-    });
-}, 30000);
 
 server.listen(PORT, () => console.log(`Proxy on port ${PORT}`));
